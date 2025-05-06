@@ -1,0 +1,46 @@
+version: "2"
+
+services:
+  database:
+    image: postgres
+    environment:
+      POSTGRES_DB: ${PG_DATABASE}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      db-net:
+
+  otree:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgres://${PG_USER}:${PG_PASSWORD}@${PG_INSTANCE}/${PG_DATABASE}"
+      OTREE_ADMIN_PASSWORD: ${OTREE_ADMIN_PASSWORD}
+      OTREE_PRODUCTION: ${OTREE_PRODUCTION}
+      OTREE_AUTH_LEVEL: ${OTREE_AUTH_LEVEL}
+      BACKEND_URL: ${BACKEND_URL}
+      MODEL_CONFIG_NAME: ${MODEL_CONFIG_NAME}
+      API_APP_USER: ${API_APP_USER}
+      API_APP_PASSWORD: ${API_APP_PASSWORD}
+    ports:
+      - 8001:8000
+    restart: always
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - db-net
+
+volumes:
+  database:
+  otree-resetdb:
+
+networks:
+  db-net:

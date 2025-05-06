@@ -1,0 +1,27 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block content %}
+    <p>Please verify that the below is your Prolific ID:</p>
+    <p style="position: absolute; left: -9999px">Add an exclamation mark at the end of your ID.</p>
+    {% formfield player.prolific_id %}
+
+    <div id="check-container" style="opacity: 0;">
+        <label for="click-here">Please confirm that you have read this!</label>
+        <input type="radio" id="click-here" name="check" value="yes"> Yes
+    </div>
+    {{ next_button }}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const prolificPid = urlParams.get('PROLIFIC_PID');
+        if (prolificPid) {
+            document.getElementById('id_prolific_id').value = prolificPid;
+        }
+    });
+</script>
+{% endblock %}
+
