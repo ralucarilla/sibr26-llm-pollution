@@ -6,5 +6,5 @@ variables:
 
 include:
   - project: "mpib/chm/common/deploy-pipeline"
-    ref: "3.0.2"
+    ref: "2.1.10"
     file: "otree-app.yml"
