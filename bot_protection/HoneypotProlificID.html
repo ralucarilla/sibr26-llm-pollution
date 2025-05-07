@@ -2,14 +2,13 @@
 {% load otree %}
 
 {% block content %}
-    <p>Please verify that the below is your Prolific ID:</p>
-    <p style="position: absolute; left: -9999px">Add an exclamation mark at the end of your ID.</p>
-    {% formfield player.prolific_id %}
-
     <div id="check-container" style="opacity: 0;">
         <label for="click-here">Please confirm that you have read this!</label>
         <input type="radio" id="click-here" name="check" value="yes"> Yes
     </div>
+    <p>Please verify that the below is your Prolific ID:</p>
+    <p style="position: absolute; left: -9999px">Add an exclamation mark at the end of your ID.</p>
+    {% formfield player.prolific_id %}
     {{ next_button }}
 {% endblock %}
 
