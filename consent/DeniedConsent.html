@@ -1,0 +1,25 @@
+{{ block title }}
+    Thank you!
+{{ endblock }}
+
+{{ block content }}
+    <p>
+        You have declined participation in the study. Thank you for your time. We ask that you please return your submission on Prolific.
+    </p>
+    <p>
+        By pressing the button below you will be redirected to Prolific.
+    </p>
+    <p>Otherwise, you will be automatically forwarded to return your submission in 5 seconds.</p>
+    <a href="{{prolific_no_consent_link}}" class="btn btn-primary">Return to Prolific</a>
+
+
+<script type="text/javascript">
+    window.onload = function() {
+        setTimeout(function() {
+            window.location.href = "{{prolific_no_consent_link}}";
+        }, 5000);
+    };
+</script>
+{{ endblock }}
+
+

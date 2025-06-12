@@ -1,0 +1,35 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block content %}
+
+<p>In studies like ours, there are sometimes a few people who do not carefully read the questions they are asked. 
+These random answers are problematic because they compromise the results of the studies. It is very important 
+that you pay attention and read each question. In order to show that you read our questions carefully 
+(and regardless of your own opinion), please select "Reddit" as the answer to the following question.</p>
+
+<form class="otree-form" method="post">
+    <div class="form-group">
+        <label class="control-label mb-3">
+            When an important event is happening or is about to happen, many people try to get informed about the development of the situation. 
+            In such situations, where do you get your information from?
+        </label><br> 
+
+        {% for choice in media_options %}
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="ac1" value="{{ choice }}" required>
+                <label class="form-check-label">{{ choice }}</label>
+            </div>
+        {% endfor %}
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="ac1" value="Other" required>
+            <label class="form-check-label">Other</label>
+            <input type="text" class="form-control mt-1" name="ac1_other" placeholder="Please specify" style="max-width: 300px;">
+        </div>
+    </div>
+    {{ formfield_errors "ac1" }}
+    <br>
+    {% next_button %}
+</form>
+{% endblock %}

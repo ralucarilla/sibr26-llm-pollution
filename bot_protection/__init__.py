@@ -26,14 +26,7 @@ class Player(BasePlayer):
     prolific_id = models.StringField(label='')
     check = models.StringField(blank=True)
     feedback = models.LongStringField(blank=True)
-    riddle1 = models.StringField(initial=None)
-    riddle2 = models.StringField(initial=None)
-    riddle3 = models.StringField(initial=None)
-    riddle4 = models.StringField(initial=None)
-    riddle5 = models.StringField(initial=None)
-    riddle6 = models.StringField(initial=None)
-    consistency1 = models.StringField(initial=None, label='')
-    consistency2 = models.StringField(initial=None, label='')
+    bot_check = models.StringField(initial=None)
 
 
 #### bot protection options ####
@@ -93,37 +86,10 @@ class HoneypotFeedback(Page):
     def error_message(player, values):
         if values['feedback'] == '':
             return 'Please answer this question.'
-
-# 4. riddles
-class Riddle1(Page):
-    form_model = 'player'
-    form_fields = ['riddle1']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['riddle1'] == '':
-            return 'Please answer this question.'
-
-class Riddle2(Page):
-    form_model = 'player'
-    form_fields = ['riddle2']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['riddle2'] == '':
-            return 'Please answer this question.'
         
-class Riddle3(Page):
+class HoneypotBreton(Page):
     form_model = 'player'
-    form_fields = ['riddle3']
+    form_fields = ['bot_check']
 
     @staticmethod
     def vars_for_template(player: Player):
@@ -131,75 +97,9 @@ class Riddle3(Page):
     
     @staticmethod
     def error_message(player, values):
-        if values['riddle3'] == '':
+        if values['bot_check'] == '':
             return 'Please answer this question.'
 
-class Riddle4(Page):
-    form_model = 'player'
-    form_fields = ['riddle4']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['riddle4'] == '':
-            return 'Please answer this question.'
-        
-class Riddle5(Page):
-    form_model = 'player'
-    form_fields = ['riddle5']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['riddle5'] == '':
-            return 'Please answer this question.'
-        
-class Riddle6(Page):
-    form_model = 'player'
-    form_fields = ['riddle6']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['riddle6'] == '':
-            return 'Please answer this question.'
-
-# 5. consistency check
-class Age(Page):
-    form_model = 'player'
-    form_fields = ['consistency1']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['consistency1'] == '':
-            return 'Please answer this question.'
-        
-class Demographics(Page):
-    form_model = 'player'
-    form_fields = ['consistency2']
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['consistency2'] == '':
-            return 'Please answer this question.'
-        
 class Thanks(Page):
     form_model = 'player'
     form_fields = []
@@ -212,6 +112,5 @@ class Thanks(Page):
     def before_next_page(player: Player, timeout_happened):
         pass
         
-page_sequence = [Age, HoneypotProlificID, HoneypotAttentionCheck,
-                Riddle1, Riddle2, Riddle3, Riddle4,
-                Riddle5, Riddle6, HoneypotFeedback, Demographics, Thanks]
+page_sequence = [HoneypotProlificID, HoneypotAttentionCheck, HoneypotFeedback,
+                 HoneypotBreton, Thanks]
