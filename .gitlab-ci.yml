@@ -8,3 +8,7 @@ include:
   - project: "mpib/chm/common/deploy-pipeline"
     ref: "2.1.10"
     file: "otree-app.yml"
+
+workflow:
+  rules:
+  - when: always
