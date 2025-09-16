@@ -2,16 +2,14 @@ from os import environ
 
 SESSION_CONFIGS = [
     dict(
-         name='otree_template',
-         display_name="Otree Starter Pack",
+         name='ai_fat_2025',
+         display_name="AI FAT 2025",
          num_demo_participants=12,
-         app_sequence=['consent', 'attention_check','basics', 'bot_protection'],
-         # set up prolific paths for completion, attention checks, etc.
-         # replace YOUR_CODE with your actual Prolific code for each path
-         prolific_completion_link='https://app.prolific.com/submissions/complete?cc=YOUR_CODE',
-         prolific_attention_link='https://app.prolific.com/submissions/complete?cc=YOUR_CODE',
-         prolific_no_consent_link='https://app.prolific.com/submissions/complete?cc=YOUR_CODE',
-         prolific_comprehension_link='https://app.prolific.com/submissions/complete?cc=YOUR_CODE',
+         app_sequence=['_1_consent', '_2_main','_3_exit_questions', '_4_demographics', '_5_feedback'],
+         prolific_completion_link='https://app.prolific.com/submissions/complete?cc=CODE',
+         prolific_attention_link='https://app.prolific.com/submissions/complete?cc=CODE',
+         prolific_no_consent_link='https://app.prolific.com/submissions/complete?cc=CODE',
+         prolific_comprehension_link='https://app.prolific.com/submissions/complete?cc=CODE',
     ),
 ]
 
@@ -21,15 +19,15 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, # if USE_POINTS is True, this is the conversion rate
+    real_world_currency_per_point=1.00,
     participation_fee=0.00, # replace with base fee for participating in the experiment
     doc=""
 )
 
 # for deployment, initialize rooms:
-ROOMS = [dict(name='testing', display_name='Testing'), ]
+ROOMS = [dict(name='ai_fat_2025', display_name='AI FAT 2025'), ]
 
-PARTICIPANT_FIELDS = []
+PARTICIPANT_FIELDS = ['associations']
 SESSION_FIELDS = []
 
 LANGUAGE_CODE = 'en' # ISO-639 code

@@ -31,7 +31,7 @@ class Player(BasePlayer):
         widget=widgets.RadioSelect
     )
 
-class Consent(Page):
+class p0_consent(Page):
     form_model = 'player'
     form_fields = ['participation_consent', 'data_consent']
     
@@ -44,7 +44,7 @@ class Consent(Page):
         if not player.participation_consent or not player.data_consent:
             player.participant.vars['consent_failed'] = True
 
-class DeniedConsent(Page):
+class pEnd_no_consent(Page):
     @staticmethod
     def is_displayed(player):
         return player.participant.vars.get('consent_failed', False)
@@ -54,4 +54,4 @@ class DeniedConsent(Page):
             'prolific_no_consent_link': player.session.config.get('prolific_no_consent_link'),
         }
 
-page_sequence = [Consent, DeniedConsent]
+page_sequence = [p0_consent, pEnd_no_consent]

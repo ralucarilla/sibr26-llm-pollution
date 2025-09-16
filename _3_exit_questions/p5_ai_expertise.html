@@ -1,0 +1,54 @@
+{% extends "global/Page.html" %}
+
+{% block content %}
+
+<p>How would you rate <strong>your expertise</strong> regarding artificial intelligence?</p>
+
+<br>
+
+<table class="scale">
+  <tr>
+    <td>
+      <div class="label">I know<br>nothing<br>about AI</div>
+      <div class="label">0</div>
+    </td>
+
+    <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    <td>6</td><td>7</td><td>8</td><td>9</td>
+
+    <td>
+      <div class="label">I'm an<br>AI expert</div>
+      <div class="label">10</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td><input type="radio" name="ai_expertise" value="0" required></td>
+    <td><input type="radio" name="ai_expertise" value="1"></td>
+    <td><input type="radio" name="ai_expertise" value="2"></td>
+    <td><input type="radio" name="ai_expertise" value="3"></td>
+    <td><input type="radio" name="ai_expertise" value="4"></td>
+    <td><input type="radio" name="ai_expertise" value="5"></td>
+    <td><input type="radio" name="ai_expertise" value="6"></td>
+    <td><input type="radio" name="ai_expertise" value="7"></td>
+    <td><input type="radio" name="ai_expertise" value="8"></td>
+    <td><input type="radio" name="ai_expertise" value="9"></td>
+    <td><input type="radio" name="ai_expertise" value="10"></td>
+  </tr>
+</table>
+
+<br>
+<br>
+{% next_button %}
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .scale { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .scale td { padding:0; text-align:center; vertical-align:bottom; }
+  .scale .label { text-align:center }
+  .scale .desc { font-weight:400; line-height:1.2; }
+  .scale input[type="radio"] { display:block; margin:10px auto 0; }
+</style>
+{% endblock %}

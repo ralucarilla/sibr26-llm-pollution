@@ -1,0 +1,54 @@
+{% extends "global/Page.html" %}
+
+{% block content %}
+
+<p>How often do <strong>you make use of artificial intelligence</strong> in your regular life?<br>
+
+<br>
+
+<table class="scale">
+  <tr>
+    <td>
+      <div class="label">I never<br>use AI</div>
+      <div class="label">0</div>
+    </td>
+
+    <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+    <td>6</td><td>7</td><td>8</td><td>9</td>
+
+    <td>
+      <div class="label">I use<br>AI all<br>the time</div>
+      <div class="label">10</div>
+    </td>
+  </tr>
+
+  <tr>
+    <td><input type="radio" name="daily_ai_use" value="0"></td>
+    <td><input type="radio" name="daily_ai_use" value="1"></td>
+    <td><input type="radio" name="daily_ai_use" value="2"></td>
+    <td><input type="radio" name="daily_ai_use" value="3"></td>
+    <td><input type="radio" name="daily_ai_use" value="4"></td>
+    <td><input type="radio" name="daily_ai_use" value="5"></td>
+    <td><input type="radio" name="daily_ai_use" value="6"></td>
+    <td><input type="radio" name="daily_ai_use" value="7"></td>
+    <td><input type="radio" name="daily_ai_use" value="8"></td>
+    <td><input type="radio" name="daily_ai_use" value="9"></td>
+    <td><input type="radio" name="daily_ai_use" value="10"></td>
+  </tr>
+</table>
+
+<br>
+<br>
+{% next_button %}
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .scale { width:100%; border-collapse:collapse; table-layout:fixed; }
+  .scale td { padding:0; text-align:center; vertical-align:bottom; }
+  .scale .label { text-align:center }
+  .scale .desc { font-weight:400; line-height:1.2; }
+  .scale input[type="radio"] { display:block; margin:10px auto 0; }
+</style>
+{% endblock %}
