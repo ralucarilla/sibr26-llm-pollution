@@ -28,6 +28,7 @@ class Player(BasePlayer):
         ]
     )
     gender_self_describe = models.StringField(label="",blank=True)
+    illusion_response = models.StringField(label="Is this the head of a duck or a rabbit?")
 
 
 class p7_age(Page):
@@ -42,5 +43,14 @@ class p8_gender(Page):
     def error_message(player, values):
         if values.get('gender') == 'self_describe' and not values.get('gender_self_describe'):
             return 'Please provide more details.'
+        
+class p0_illusion(Page):
+    form_model = 'player'
+    form_fields = ["illusion_response"]
 
-page_sequence = [p7_age, p8_gender]
+    @staticmethod
+    def error_message(player, values):
+        if values['illusion_response'] is None:
+            return 'Please answer the question.'
+
+page_sequence = [p7_age, p8_gender, p0_illusion]

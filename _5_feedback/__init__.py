@@ -77,11 +77,6 @@ class p12_prolific_id(Page):
     @staticmethod
     def vars_for_template(player: Player):
         return dict()
-    
-    @staticmethod
-    def error_message(player, values):
-        if values['prolific_id'] == '':
-            return 'Please answer this question.'
         
 class p13_thanks(Page):
     @staticmethod

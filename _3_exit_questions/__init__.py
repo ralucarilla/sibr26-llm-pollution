@@ -21,45 +21,29 @@ class Player(BasePlayer):
     ai_risk = models.IntegerField(min=0, max=10)
     daily_ai_use = models.IntegerField(min=0, max=10)
     ai_expertise = models.IntegerField(min=0, max=10)
-    ai_expertise_justification = models.LongStringField(blank=True, label="")
+    ai_expertise_justification = models.LongStringField(label="")
 
 
 class p2_ai_trust(Page):
     form_model = 'player'
     form_fields = ['ai_trust']
     
-    @staticmethod
-    def error_message(player, values):
-        if values.get('ai_trust') is None:
-            return 'Please answer this question.'
         
 class p3_ai_risk(Page):
     form_model = 'player'
     form_fields = ['ai_risk']
     
-    @staticmethod
-    def error_message(player, values):
-        if values.get('ai_risk') is None:
-            return 'Please answer this question.'
-        
+
 class p4_daily_ai_use(Page):
     form_model = 'player'
     form_fields = ['daily_ai_use']
-    
-    @staticmethod
-    def error_message(player, values):
-        if values.get('daily_ai_use') is None:
-            return 'Please answer this question.'
-        
+
+
 class p5_ai_expertise(Page):
     form_model = 'player'
     form_fields = ['ai_expertise']
-    
-    @staticmethod
-    def error_message(player, values):
-        if values.get('ai_expertise') is None:
-            return 'Please answer this question.'
         
+
 class p6_ai_expertise_justification(Page):
     form_model = 'player'
     form_fields = ['ai_expertise_justification']
