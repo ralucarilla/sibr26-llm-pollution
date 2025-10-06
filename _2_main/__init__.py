@@ -12,7 +12,7 @@ class C(BaseConstants):
     NAME_IN_URL = 'fat'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
-    RECAPTCHA_SECRET_KEY = os.environ.get('reCAPTCHA_SECRET_KEY')
+    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
 
 class Subsession(BaseSubsession):
     prolific_completion_link = models.StringField()
