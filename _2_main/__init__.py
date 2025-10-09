@@ -1,6 +1,4 @@
 from otree.api import *
-import itertools
-import requests
 import os
 
 doc = """
@@ -12,7 +10,6 @@ class C(BaseConstants):
     NAME_IN_URL = 'fat'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
-    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
 
 class Subsession(BaseSubsession):
     prolific_completion_link = models.StringField()
@@ -49,52 +46,11 @@ class Player(BasePlayer):
     association3 = models.StringField(label="", blank=True)
     association4 = models.StringField(label="", blank=True)
     association5 = models.StringField(label="", blank=True)
-    recaptcha_score = models.FloatField(blank=True)
-    is_bot = models.BooleanField(blank=True)
-    page_load_time = models.FloatField(blank=True)
-    total_time_on_page = models.FloatField(blank=True)
-
 
 # PAGES
 class p1_associations(Page):
     form_model = 'player'
-    form_fields = ['association1', 'association2', 'association3', 'association4', 'association5']
-
-    def live_method(player, data):
-        if 'page_load_time' in data:
-            player.page_load_time = data['page_load_time']
-            return {player.id_in_group: {'received': True}}
-        
-        if 'total_time_on_page' in data:
-            player.total_time_on_page = data['total_time_on_page']
-            return {player.id_in_group: {'time_logged': True}}
-
-        if 'recaptcha_response' in data:
-            verification_data = {
-                'secret': C.RECAPTCHA_SECRET_KEY,
-                'response': data['recaptcha_response']
-            }
-            
-            try:
-                response = requests.post(
-                    'https://www.google.com/recaptcha/api/siteverify', 
-                    data=verification_data
-                )
-                result = response.json()
-                
-                player.recaptcha_score = result.get('score')
-                player.is_bot = result.get('score', 1) < 0.5 
-                
-                if player.is_bot:
-                    print(f"Potential bot detected: Player {player.id_in_group}, Score: {player.recaptcha_score}")
-                
-                return {player.id_in_group: {'recaptcha_verified': True, 'is_bot': player.is_bot}}
-            
-            except Exception as e:
-                print(f"reCAPTCHA verification error: {e}")
-                return {player.id_in_group: {'error': str(e)}}
-        
-        return {player.id_in_group: {'received': True}}
+    form_fields = ['association1','association2','association3','association4','association5']
 
     @staticmethod
     def before_next_page(player, timeout_happened):
@@ -103,7 +59,7 @@ class p1_associations(Page):
             'association2': player.association2,
             'association3': player.association3,
             'association4': player.association4,
-            'association5': player.association5
+            'association5': player.association5,
         }
 
 

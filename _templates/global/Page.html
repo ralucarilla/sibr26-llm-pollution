@@ -1,8 +1,22 @@
 {% extends "otree/Page.html" %}
 {% load otree static %}
 
-{% block global_styles  %}
-{% endblock %}
+{% block global_styles %}{% endblock %}
 
-{% block global_scripts  %}
+{% block global_scripts %}
+  <script src="https://www.google.com/recaptcha/api.js?render={{ session.config.recaptcha_site_key }}"></script>
+  <script>
+    window.execRecaptcha = function(action) {
+      return new Promise(function(resolve, reject) {
+        if (typeof grecaptcha === 'undefined' || !grecaptcha.ready) {
+          return reject(new Error('reCAPTCHA not loaded'));
+        }
+        grecaptcha.ready(function() {
+          grecaptcha.execute('{{ session.config.recaptcha_site_key }}', { action })
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+    };
+  </script>
 {% endblock %}

@@ -1,5 +1,5 @@
 from otree.api import *
-import random
+import requests
 
 doc = """
 
@@ -32,6 +32,8 @@ class Player(BasePlayer):
     feedback = models.LongStringField(blank=True, label="")
     check = models.StringField(blank=True)
     prolific_id = models.StringField(label='')
+    recaptcha_token = models.StringField(blank=True)
+    recaptcha_score = models.FloatField(blank=True)
     
     
 class p9_srsi_use_me(Page):
@@ -72,11 +74,26 @@ class p11_feedback(Page):
 
 class p12_prolific_id(Page):
     form_model = 'player'
-    form_fields = ['prolific_id', 'check']
+    form_fields = ['prolific_id', 'check', 'recaptcha_token'] 
 
     @staticmethod
-    def vars_for_template(player: Player):
-        return dict()
+    def before_next_page(player: Player, timeout_happened):
+        token = player.recaptcha_token
+        if not token:
+            player.recaptcha_score = None
+            return
+
+        secret = player.session.config.get('recaptcha_secret_key')
+        try:
+            resp = requests.post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                data={'secret': secret, 'response': token},
+                timeout=5
+            ).json()
+            player.recaptcha_score = float(resp.get('score', 0) or 5)
+        except Exception as e:
+            print('[reCAPTCHA] verify error:', e)
+            player.recaptcha_score = None
         
 class p13_thanks(Page):
     @staticmethod

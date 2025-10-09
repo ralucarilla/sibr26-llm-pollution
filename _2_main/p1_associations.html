@@ -1,4 +1,5 @@
 
+{% extends "global/Page.html" %}
 {{ block content }}
 <p><b>What comes to your mind when you think of artificial intelligence (AI)?</b></p>
 <p>List the <b>first five thoughts</b> that spontaneously come to your mind. Enter these
@@ -8,65 +9,4 @@ If less than five associations come to mind, leave the remaining fields empty.</
     <br>
     {{ next_button }}
 
-{{ endblock }}
-
-{{ block scripts }}
-<script>
-  const t0 = performance.now();
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const pageLoadSec = (performance.now() - t0) / 1000.0;
-    try { liveSend({ page_load_time: pageLoadSec }); } catch (e) {}
-    const loadInput = document.getElementById('id_page_load_time');
-    if (loadInput) loadInput.value = pageLoadSec;
-  });
-
-  window.addEventListener('beforeunload', function () {
-    const totalSec = (performance.now() - t0) / 1000.0;
-    try { liveSend({ total_time_on_page: totalSec }); } catch (e) {}
-  });
-
-  (function () {
-    const form   = document.getElementById('form') || document.querySelector('form');
-    const nextBtn = document.getElementById('next-btn') || document.querySelector('.otree-btn-next');
-    if (!form || !nextBtn) return;
-
-    let recaptchaRequested = false;
-
-    nextBtn.addEventListener('click', function () {
-      if (recaptchaRequested) return; 
-      recaptchaRequested = true;
-      nextBtn.disabled = true;
-
-      const totalSec = (performance.now() - t0) / 1000.0;
-      const totalInput = document.getElementById('id_total_time_on_page');
-      if (totalInput) totalInput.value = totalSec;
-
-      try { liveSend({ total_time_on_page: totalSec }); } catch (e) {}
-
-
-      const siteKey = "{{ C.RECAPTCHA_SECRET_KEY }}"; 
-      const action  = "submit_associations";             
-
-      if (typeof grecaptcha !== 'undefined' && grecaptcha.ready) {
-        grecaptcha.ready(function () {
-          grecaptcha.execute(siteKey, { action: action })
-            .then(function (token) {
-              try { liveSend({ recaptcha_response: token }); } catch (e) {}
-              form.submit();
-            })
-            .catch(function () {
-              // if reCAPTCHA fails, still submit
-              form.submit();
-            });
-        });
-      } else {
-        // no recaptcha available; just submit
-        form.submit();
-      }
-    });
-
-
-  })();
-</script>
 {{ endblock }}
