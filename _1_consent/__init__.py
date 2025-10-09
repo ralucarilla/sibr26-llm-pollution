@@ -9,49 +9,50 @@ class C(BaseConstants):
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
 
+
 class Subsession(BaseSubsession):
     pass
+
 
 class Group(BaseGroup):
     pass
 
+
 class Player(BasePlayer):
-    participation_consent = models.BooleanField(label="",
+    consent = models.BooleanField(
+        label="",
         choices=[
-            [True, "Yes, I agree"],
-            [False, "No, I don't agree"]
+            [True, "I agree with this declaration of consent and the processing of my personal data"],
+            [False, "I do not agree with this declaration of consent, the processing of my personal data and do not want to participate"],
         ],
-        widget=widgets.RadioSelect
+        widget=widgets.RadioSelect,
     )
-    data_consent = models.BooleanField(label="",
-        choices=[
-            [True, "Yes, I agree"],
-            [False, "No, I don't agree"]
-        ],
-        widget=widgets.RadioSelect
-    )
+
 
 class p0_consent(Page):
     form_model = 'player'
-    form_fields = ['participation_consent', 'data_consent']
-    
+    form_fields = ['consent']
+
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Player):
         return player.round_number == 1
-    
+
     @staticmethod
-    def before_next_page(player, timeout_happened):
-        if not player.participation_consent or not player.data_consent:
+    def before_next_page(player: Player, timeout_happened):
+        if not player.consent:
             player.participant.vars['consent_failed'] = True
+
 
 class pEnd_no_consent(Page):
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Player):
         return player.participant.vars.get('consent_failed', False)
-    
-    def vars_for_template(player):
+
+    @staticmethod
+    def vars_for_template(player: Player):
         return {
             'prolific_no_consent_link': player.session.config.get('prolific_no_consent_link'),
         }
+
 
 page_sequence = [p0_consent, pEnd_no_consent]
