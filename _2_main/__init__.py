@@ -23,10 +23,8 @@ def creating_session(subsession):
     """
     expected_fields = [
         "prolific_completion_link",
-        "prolific_attention_link",
-        "prolific_no_consent_link",
-        "prolific_comprehension_link"
-    ]
+        "prolific_no_consent_link"
+        ]
     
     for field in expected_fields:
         if field not in subsession.session.config:
