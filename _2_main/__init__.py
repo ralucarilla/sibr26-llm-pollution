@@ -13,9 +13,7 @@ class C(BaseConstants):
 
 class Subsession(BaseSubsession):
     prolific_completion_link = models.StringField()
-    prolific_attention_link = models.StringField()
     prolific_no_consent_link = models.StringField()
-    prolific_comprehension_link = models.StringField()
 
 def creating_session(subsession):
     """
