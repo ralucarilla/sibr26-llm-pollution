@@ -29,7 +29,7 @@ class Player(BasePlayer):
         ['yes', 'Yes, I have used AI.'],
         ['no', 'No, I have not used AI.']
         ])
-    feedback = models.LongStringField(blank=True, label="")
+    feedback = models.LongStringField(label="")
     check = models.StringField(blank=True)
     prolific_id = models.StringField(label='')
     recaptcha_token = models.StringField(blank=True)

@@ -1,7 +1,19 @@
 {% extends "otree/Page.html" %}
 {% load otree static %}
 
-{% block global_styles %}{% endblock %}
+{% block global_styles %}
+<style>
+  /* disable text selection globally */
+  html, body, * {
+    -webkit-user-select: none !important; 
+    -moz-user-select: none !important;    
+    -ms-user-select: none !important;    
+    user-select: none !important;       
+    -webkit-touch-callout: none;     
+  }
+</style>
+{% endblock %}
+
 
 {% block global_scripts %}
   <script src="https://www.google.com/recaptcha/api.js?render={{ session.config.recaptcha_site_key }}"></script>
@@ -18,5 +30,79 @@
         });
       });
     };
+    </script>
+    <script>
+    (function () {
+      const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+      const msgs = {
+        copy: "Copy is disabled.",
+        paste: "Paste is disabled. Please type your response.",
+        cut: "Cut is disabled.",
+        context: "Right-click is disabled.",
+        drop: "Drag-and-drop is disabled."
+      };
+
+      const showOnce = (() => {
+        let last = 0;
+        return (text) => {
+          const now = Date.now();
+          if (now - last > 1000) {
+            last = now;
+            alert(text);
+          }
+        };
+      })();
+
+      document.addEventListener("keydown", (e) => {
+        const ctrl = isMac ? e.metaKey : e.ctrlKey;
+        const key = (e.key || "").toLowerCase();
+
+        const isPaste = (ctrl && key === "v") || (e.shiftKey && key === "insert");
+        const isCopy = ctrl && key === "c";
+        const isCut  = ctrl && key === "x";
+
+        if (isPaste || isCopy || isCut) {
+          e.preventDefault();
+          showOnce(isPaste ? msgs.paste : isCopy ? msgs.copy : msgs.cut);
+        }
+      }, true);
+
+      document.addEventListener("auxclick", (e) => {
+        if (e.button === 1) {
+          e.preventDefault();
+          showOnce(msgs.paste);
+        }
+      }, true);
+
+      ["copy", "cut", "paste"].forEach((type) => {
+        document.addEventListener(type, (e) => {
+          e.preventDefault();
+          showOnce(type === "paste" ? msgs.paste : type === "copy" ? msgs.copy : msgs.cut);
+        }, true);
+      });
+
+      document.addEventListener("beforeinput", (e) => {
+        if (
+          e.inputType === "insertFromPaste" ||
+          e.inputType === "insertFromPasteAsQuotation" ||
+          e.inputType === "insertFromDrop"
+        ) {
+          e.preventDefault();
+          showOnce(msgs.paste);
+        }
+      }, true);
+
+      ["dragover", "drop"].forEach((type) => {
+        document.addEventListener(type, (e) => {
+          e.preventDefault();
+          if (type === "drop") showOnce(msgs.drop);
+        }, true);
+      });
+
+      document.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        showOnce(msgs.context);
+      }, true);
+    })();
   </script>
 {% endblock %}
