@@ -17,14 +17,14 @@ class Group(BaseGroup):
     pass
 
 class Player(BasePlayer):
-    srsi_use_me = models.StringField(widget=widgets.RadioSelect, label="",
+    include_data = models.StringField(widget=widgets.RadioSelect, label="",
         choices=[
             ['yes', 'Yes'],
             ['no', 'No (please provide an explanation)'],
         ]
     )
-    srsi_use_me_justification = models.StringField(blank=True, label="")
-    ai_use = models.StringField(widget=widgets.RadioSelect, label="",
+    include_data_justification = models.StringField(blank=True, label="")
+    ai_use_survey = models.StringField(widget=widgets.RadioSelect, label="",
         choices=[
         ['yes', 'Yes, I have used AI.'],
         ['no', 'No, I have not used AI.']
@@ -38,23 +38,23 @@ class Player(BasePlayer):
     
 class p9_srsi_use_me(Page):
     form_model = 'player'
-    form_fields = ['srsi_use_me', 'srsi_use_me_justification']
+    form_fields = ['include_data', 'include_data_justification']
 
     @staticmethod
     def error_message(player, values):
-        if not values.get('srsi_use_me'):
+        if not values.get('include_data'):
             return 'Please answer this question.'
-        if values.get('srsi_use_me') == 'no' and not values.get('srsi_use_me_justification'):
+        if values.get('include_data') == 'no' and not values.get('include_data_justification'):
             return 'Please specify your answer.'
     
 
 class p10_ai_use(Page):
     form_model = 'player'
-    form_fields = ['ai_use']
+    form_fields = ['ai_use_survey']
 
     @staticmethod
     def error_message(player, values):
-        if not values.get('ai_use'):
+        if not values.get('ai_use_survey'):
             return 'Please answer this question.'
     
 
