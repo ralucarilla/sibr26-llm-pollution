@@ -26,12 +26,12 @@ class Player(BasePlayer):
 class p2_ai_trust(Page):
     form_model = 'player'
     form_fields = ['ai_trust']
-    
+
         
 class p3_ai_risk(Page):
     form_model = 'player'
     form_fields = ['ai_risk']
-    
+
 
 class p4_daily_ai_use(Page):
     form_model = 'player'

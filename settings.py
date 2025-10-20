@@ -7,7 +7,7 @@ SESSION_CONFIGS = [
          num_demo_participants=12,
          app_sequence=['_1_consent', '_2_main','_3_exit_questions', '_4_demographics', '_5_feedback'],
          prolific_completion_link='https://app.prolific.com/submissions/complete?cc=C1BZPBSV',
-         prolific_no_consent_link='https://app.prolific.com/submissions/complete?cc=C3YAIOZN',
+         prolific_no_consent_link='https://app.prolific.com/submissions/complete?cc=CV0OVHOL',
          recaptcha_site_key=environ.get('RECAPTCHA_SITE_KEY'),
          recaptcha_secret_key=environ.get('RECAPTCHA_SECRET_KEY'),
     ),
