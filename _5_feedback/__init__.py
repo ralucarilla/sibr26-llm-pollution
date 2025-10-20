@@ -64,7 +64,7 @@ class p10_ai_use(Page):
 
 class p11_feedback(Page):
     form_model = 'player'
-    form_fields = ['feedback', 'participant_metrics_json']
+    form_fields = ['feedback']
 
     @staticmethod
     def error_message(player, values):
