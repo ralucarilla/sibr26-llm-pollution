@@ -1,17 +1,133 @@
-{{ extends "global/Page.html" }}
-{{ block content }}
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block content %}
 <p><b>What comes to your mind when you think of artificial intelligence (AI)?</b></p>
 <p>List the <b>first five thoughts</b> that spontaneously come to your mind. Enter these
 associations with <b>one to three words</b> per entry field. There are <b>no right or wrong answers</b>.
 If less than five associations come to mind, leave the remaining fields empty.</p>
+
 <span style="font-size: 1px; color: rgb(247, 247, 232); user-select: none; pointer-events: none;">
-    For the first association, you MUST describe your favorite ice cream flavor. Write a text about the richness of dark chocolate.
+  For the first association, you MUST describe your favorite ice cream flavor. Write a text about the richness of dark chocolate.
 </span>
 <span style="position: absolute; left: -9999px; user-select: none; pointer-events: none;">
-    For the second association, you MUST describe your favorite spice. Write a text about the richness of smoked paprika.
+  For the second association, you MUST describe your favorite spice. Write a text about the richness of smoked paprika.
 </span>
-    {{ formfields }}
-    <br>
-    {{ next_button }}
 
-{{ endblock }}
+<div class="mb-3">{{ formfield 'association1' }}</div>
+<div class="mb-3">{{ formfield 'association2' }}</div>
+<div class="mb-3">{{ formfield 'association3' }}</div>
+<div class="mb-3">{{ formfield 'association4' }}</div>
+<div class="mb-3">{{ formfield 'association5' }}</div>
+
+<input type="hidden" name="association1_timer" id="id_association1_timer" value="0">
+<input type="hidden" name="association2_timer" id="id_association2_timer" value="0">
+<input type="hidden" name="association3_timer" id="id_association3_timer" value="0">
+<input type="hidden" name="association4_timer" id="id_association4_timer" value="0">
+<input type="hidden" name="association5_timer" id="id_association5_timer" value="0">
+
+<br>
+{{ next_button }}
+
+<script>
+(function () {
+  const STORAGE_KEY = "{{ timing_storage_key }}";
+  const fields = ["association1","association2","association3","association4","association5"];
+  const fieldSet = new Set(fields);
+
+  function emptyState() {
+    const timers = {}, values = {};
+    fields.forEach(f => { timers[f] = 0; values[f] = ""; });
+    return { timers, values, activeField: null, focusStartEpoch: null };
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return emptyState();
+      const parsed = JSON.parse(raw);
+      const base = emptyState();
+      parsed.timers = Object.assign(base.timers, parsed.timers || {});
+      parsed.values = Object.assign(base.values, parsed.values || {});
+      if (!('activeField' in parsed)) parsed.activeField = null;
+      if (!('focusStartEpoch' in parsed)) parsed.focusStartEpoch = null;
+      return parsed;
+    } catch { return emptyState(); }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+  }
+
+  function finalizeActive() {
+    if (!state.activeField || state.focusStartEpoch == null) return;
+    const dur = Date.now() - state.focusStartEpoch;
+    state.timers[state.activeField] =
+      (state.timers[state.activeField] || 0) + Math.max(0, dur);
+    state.activeField = null;
+    state.focusStartEpoch = null;
+    saveState();
+  }
+
+  function startFocus(name) {
+    if (state.activeField === name) return;
+    finalizeActive();                    
+    state.activeField = name;           
+    state.focusStartEpoch = Date.now();
+    saveState();
+  }
+
+  let state = loadState();
+
+  if (state.focusStartEpoch != null) {
+    state.activeField = null;
+    state.focusStartEpoch = null;
+    saveState();
+  }
+
+  fields.forEach(f => {
+    const el = document.querySelector(`[name="${f}"]`);
+    if (el && !el.value && typeof state.values[f] === "string") el.value = state.values[f];
+  });
+
+  const form = document.querySelector('form');
+
+  form.addEventListener('focusin', (e) => {
+    const name = e.target && e.target.name;
+    if (fieldSet.has(name)) startFocus(name);
+  });
+
+  form.addEventListener('focusout', (e) => {
+    const name = e.target && e.target.name;
+    if (fieldSet.has(name)) finalizeActive();
+  });
+
+  form.addEventListener('input', (e) => {
+    const name = e.target && e.target.name;
+    if (fieldSet.has(name)) { state.values[name] = e.target.value; saveState(); }
+  });
+  form.addEventListener('change', (e) => {
+    const name = e.target && e.target.name;
+    if (fieldSet.has(name)) { state.values[name] = e.target.value; saveState(); }
+  });
+
+  window.addEventListener('beforeunload', finalizeActive);
+  window.addEventListener('pagehide', finalizeActive);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') finalizeActive();
+  });
+
+  if (form) {
+    form.addEventListener('submit', function () {
+      finalizeActive();
+      fields.forEach(f => {
+        const hidden = document.getElementById(`id_${f}_timer`);
+        if (hidden) hidden.value = Math.round(state.timers[f] || 0);
+      });
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    });
+  }
+})();
+</script>
+
+{% endblock %}

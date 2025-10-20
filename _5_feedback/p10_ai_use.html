@@ -2,15 +2,64 @@
 {% load otree static %}
 
 {% block content %}
-
 <p>We would like to know <b>if you used any help of artificial intelligence</b> when filling
 out this survey (e.g., ChatGPT, Gemini, Claude, Operator, Nanobrowser). Do not worry,
 <b>this will also not affect your payment</b>. You will receive the promised compensation
 either way.</p>
 
-{{ formfields }}
-   
-<br>
+<div class="mb-3">
+  {{ formfield 'ai_use_survey' label="" }}
+</div>
 
-{{ next_button}}
+<div id="ai-details-wrapper" class="mb-3" hidden aria-hidden="true">
+  <label for="id_ai_use_details" class="form-label">
+    Could you provide a few details about <b>how you used AI</b> during this survey? (e.g., which tools, for what purpose)
+  </label>
+  {{ formfield 'ai_use_details' label="" }}
+</div>
+
+<br>
+{{ next_button }}
+
+<script>
+(function () {
+  const form = document.querySelector('form');
+  const yes = form.querySelector('input[name="ai_use_survey"][value="yes"]');
+  const no  = form.querySelector('input[name="ai_use_survey"][value="no"]');
+  const wrap = document.getElementById('ai-details-wrapper');
+  const details = form.querySelector('[name="ai_use_details"]');
+
+  function showDetails(show) {
+    if (!wrap) return;
+    wrap.hidden = !show;
+    wrap.setAttribute('aria-hidden', show ? 'false' : 'true');
+    if (details) {
+      details.disabled = !show;         
+      if (show) {
+        setTimeout(() => details.focus(), 0);
+      } else {
+        details.value = '';              
+      }
+    }
+  }
+
+  function updateFromSelection() {
+    showDetails(yes && yes.checked);
+  }
+
+  updateFromSelection();
+
+  [yes, no].forEach(r => r && r.addEventListener('change', updateFromSelection));
+
+  form.addEventListener('submit', (e) => {
+    const saidYes = yes && yes.checked;
+    const txt = (details && details.value || '').trim();
+    if (saidYes && !txt) {
+      e.preventDefault();
+      showDetails(true);
+      details && details.focus();
+    }
+  });
+})();
+</script>
 {% endblock %}
