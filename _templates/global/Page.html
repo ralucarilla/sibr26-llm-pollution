@@ -20,20 +20,15 @@
   <script>
     window.execRecaptcha = function(action) {
       return new Promise(function(resolve, reject) {
-        if (typeof grecaptcha === 'undefined' || !grecaptcha.ready) {
-          return reject(new Error('reCAPTCHA not loaded'));
-        }
+        if (typeof grecaptcha === 'undefined' || !grecaptcha.ready) return reject(new Error('reCAPTCHA not loaded'));
         grecaptcha.ready(function() {
-          grecaptcha.execute('{{ session.config.recaptcha_site_key }}', { action })
-            .then(resolve)
-            .catch(reject);
+          grecaptcha.execute('{{ session.config.recaptcha_site_key }}', { action }).then(resolve).catch(reject);
         });
       });
     };
   </script>
 
-
-   <script>
+  <script>
   (function () {
     const PAGE_NAME = "{{ view.__class__.__name__ }}";
     const STORE_KEY = "ot_metrics_min_final_{{ session.code }}";
@@ -44,59 +39,71 @@
       paste: "Paste is disabled. Please type your response.",
       cut: "Cut is disabled.",
       context: "Right-click is disabled.",
-      drop: "Drag-and-drop is disabled.",
+      drag: "Drag is disabled.",
+      drop: "Drop is disabled.",
       select: "Text selection is disabled."
     };
-    const showOnce = (() => {
-      let last = 0;
-      return (text) => {
-        const now = Date.now();
-        if (now - last > 900) { last = now; alert(text); }
-      };
-    })();
+    const showOnce = (() => { let last=0; return (t)=>{ const now=Date.now(); if (now-last>900){ last=now; alert(t); } }; })();
 
-    function loadStore() {
-      try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { pages: {} }; }
-      catch { return { pages: {} }; }
-    }
-    function saveStore(s) { localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
-
-    function ensureActionBuckets(p) {
-      p.counts = p.counts || { copy:0, paste:0, cut:0 };
-      p.attempts_ms = p.attempts_ms || { copy:[], paste:[], cut:[] };
-      if (p.counts.context == null) p.counts.context = 0;
-      if (!Array.isArray(p.attempts_ms.context)) p.attempts_ms.context = [];
-      if (p.counts.select == null) p.counts.select = 0;
-      if (!Array.isArray(p.attempts_ms.select)) p.attempts_ms.select = [];
-    }
-
-    function migrateStore(s) {
+    function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || { pages:{} }; }catch{ return { pages:{} }; } }
+    function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+    function migrateStore(s){
       let changed = false;
-      for (const k in (s.pages || {})) {
-        const p = s.pages[k];
-        const before = JSON.stringify(p);
-        ensureActionBuckets(p);
-        if (JSON.stringify(p) !== before) changed = true;
+      for (const k in (s.pages||{})) {
+        const p = s.pages[k] || {};
+        p.counts = p.counts || { copy:0, paste:0, cut:0 };
+        p.attempts_ms = p.attempts_ms || { copy:[], paste:[], cut:[] };
+
+        if (p.counts.context == null) p.counts.context = 0;
+        if (!Array.isArray(p.attempts_ms.context)) p.attempts_ms.context = [];
+
+        if (p.counts.select == null) p.counts.select = 0;
+        if (!Array.isArray(p.attempts_ms.select)) p.attempts_ms.select = [];
+
+        if (p.counts.drag == null) p.counts.drag = 0;
+        if (!Array.isArray(p.attempts_ms.drag)) p.attempts_ms.drag = [];
+
+        if (p.counts.drop == null) p.counts.drop = 0;
+        if (!Array.isArray(p.attempts_ms.drop)) p.attempts_ms.drop = [];
+
+        if (p.counts.dragdrop != null) {
+          p.counts.drag += p.counts.dragdrop || 0;
+          if (Array.isArray(p.attempts_ms.dragdrop)) {
+            p.attempts_ms.drag.push(...p.attempts_ms.dragdrop);
+          }
+          delete p.counts.dragdrop;
+          delete p.attempts_ms.dragdrop;
+          changed = true;
+        }
+
+        s.pages[k] = p;
       }
       if (changed) saveStore(s);
       return s;
     }
-
-    function ensurePage(s) {
+    function ensurePage(s){
       if (!s.pages[PAGE_NAME]) {
         s.pages[PAGE_NAME] = {
-          counts: { copy:0, paste:0, cut:0, context:0, select:0 },
-          attempts_ms: { copy:[], paste:[], cut:[], context:[], select:[] },
+          counts: { copy:0, paste:0, cut:0, context:0, select:0, drag:0, drop:0 },
+          attempts_ms: { copy:[], paste:[], cut:[], context:[], select:[], drag:[], drop:[] },
           time_ms: 0
         };
       } else {
-        ensureActionBuckets(s.pages[PAGE_NAME]);
+        const p = s.pages[PAGE_NAME];
+        if (p.counts.context == null) p.counts.context = 0;
+        if (!Array.isArray(p.attempts_ms.context)) p.attempts_ms.context = [];
+        if (p.counts.select == null) p.counts.select = 0;
+        if (!Array.isArray(p.attempts_ms.select)) p.attempts_ms.select = [];
+        if (p.counts.drag == null) p.counts.drag = 0;
+        if (!Array.isArray(p.attempts_ms.drag)) p.attempts_ms.drag = [];
+        if (p.counts.drop == null) p.counts.drop = 0;
+        if (!Array.isArray(p.attempts_ms.drop)) p.attempts_ms.drop = [];
       }
     }
 
     const pageStart = performance.now();
     let t0 = pageStart;
-    function addTime() {
+    function addTime(){
       const dt = Math.max(0, performance.now() - t0);
       const s = migrateStore(loadStore()); ensurePage(s);
       s.pages[PAGE_NAME].time_ms += Math.round(dt);
@@ -104,92 +111,83 @@
       t0 = performance.now();
     }
 
-    function record(action) {
+    function record(action){
       const s = migrateStore(loadStore()); ensurePage(s);
       s.pages[PAGE_NAME].counts[action] += 1;
       s.pages[PAGE_NAME].attempts_ms[action].push(Math.round(performance.now() - pageStart));
       saveStore(s);
     }
 
-    document.addEventListener("keydown", (e) => {
+    let selActive = false;
+    function beginSelect(){ if (!selActive){ selActive = true; record("select"); showOnce(msgs.select); } }
+    function endSelect(){ selActive = false; }
+
+    document.addEventListener("keydown", (e)=>{
       const ctrl = isMac ? e.metaKey : e.ctrlKey;
-      const key = (e.key || "").toLowerCase();
+      const key = (e.key||"").toLowerCase();
 
-      if ((ctrl && key === "v") || (e.shiftKey && key === "insert")) {
-        e.preventDefault(); record("paste"); showOnce(msgs.paste);
-        return;
-      }
-      if (ctrl && key === "c") { e.preventDefault(); record("copy"); showOnce(msgs.copy); return; }
-      if (ctrl && key === "x") { e.preventDefault(); record("cut");  showOnce(msgs.cut);  return; }
+      if ((ctrl && key === "v") || (e.shiftKey && key === "insert")) { e.preventDefault(); record("paste"); showOnce(msgs.paste); return; }
+      if (ctrl && key === "c") { e.preventDefault(); record("copy");  showOnce(msgs.copy);  return; }
+      if (ctrl && key === "x") { e.preventDefault(); record("cut");   showOnce(msgs.cut);   return; }
 
-      if (ctrl && key === "a") { e.preventDefault(); record("select"); showOnce(msgs.select); return; }
-      const selectionKeys = new Set(["arrowleft","arrowright","arrowup","arrowdown","home","end","pageup","pagedown"]);
-      if (e.shiftKey && selectionKeys.has(key)) {
-        e.preventDefault(); record("select"); showOnce(msgs.select); return;
-      }
+      if (ctrl && key === "a") { e.preventDefault(); beginSelect(); return; }
+      const selKeys = new Set(["arrowleft","arrowright","arrowup","arrowdown","home","end","pageup","pagedown"]);
+      if (e.shiftKey && selKeys.has(key)) { e.preventDefault(); beginSelect(); return; }
     }, true);
+    document.addEventListener("keyup", (e)=>{ if (e.key === "Shift" || e.key.toLowerCase() === "a") endSelect(); }, true);
 
-    ["copy","cut","paste"].forEach(type => {
-      document.addEventListener(type, (e) => {
-        e.preventDefault(); record(type); showOnce(msgs[type]);
-      }, true);
+    document.addEventListener("selectstart", (e)=>{ e.preventDefault(); beginSelect(); }, true);
+    document.addEventListener("dblclick", (e)=>{ e.preventDefault(); beginSelect(); }, true);
+    document.addEventListener("mousedown", (e)=>{ if (e.button===0 && (e.detail>=2 || e.shiftKey)) { e.preventDefault(); beginSelect(); } }, true);
+    document.addEventListener("mouseup", endSelect, true);
+
+    ["copy","cut","paste"].forEach(type=>{
+      document.addEventListener(type, (e)=>{ e.preventDefault(); record(type); showOnce(msgs[type]); }, true);
     });
-
-    document.addEventListener("beforeinput", (e) => {
+    document.addEventListener("beforeinput", (e)=>{
       const t = e.inputType;
-      if (t === "insertFromPaste" || t === "insertFromPasteAsQuotation") {
-        e.preventDefault(); record("paste"); showOnce(msgs.paste);
-      }
+      if (t === "insertFromPaste" || t === "insertFromPasteAsQuotation") { e.preventDefault(); record("paste"); showOnce(msgs.paste); }
     }, true);
 
-    document.addEventListener("contextmenu", (e) => {
-      e.preventDefault(); record("context"); showOnce(msgs.context);
-    }, true);
+    document.addEventListener("contextmenu", (e)=>{ e.preventDefault(); record("context"); showOnce(msgs.context); }, true);
 
-    document.addEventListener("selectstart", (e) => {
-      e.preventDefault(); record("select"); showOnce(msgs.select);
-    }, true);
-    document.addEventListener("dblclick", (e) => {
-      e.preventDefault(); record("select"); showOnce(msgs.select);
-    }, true);
-    document.addEventListener("mousedown", (e) => {
-      if (e.detail >= 3) { e.preventDefault(); record("select"); showOnce(msgs.select); }
-    }, true);
+    let dragActive = false;
+    function beginDrag(){ if (!dragActive){ dragActive = true; record("drag"); showOnce(msgs.drag); } }
+    function endDrag(){ dragActive = false; }
 
-    ["dragover","drop"].forEach(type => {
-      document.addEventListener(type, (e) => {
-        e.preventDefault();
-        if (type === "drop") showOnce(msgs.drop);
-      }, true);
-    });
+    document.addEventListener("dragstart", (e)=>{ e.preventDefault(); beginDrag(); }, true);
+    document.addEventListener("dragenter", (e)=>{ e.preventDefault(); beginDrag(); }, true);
+    document.addEventListener("dragover",  (e)=>{ e.preventDefault(); }, true);
+    document.addEventListener("dragend",   endDrag, true);
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") addTime();
-    });
+    document.addEventListener("drop", (e)=>{ e.preventDefault(); record("drop"); endDrag(); showOnce(msgs.drop); }, true);
+
+    document.addEventListener("visibilitychange", ()=>{ if (document.visibilityState === "hidden") addTime(); });
     window.addEventListener("pagehide", addTime);
     window.addEventListener("beforeunload", addTime);
 
-    function injectHidden() {
+    function injectHidden(){
       const form = document.querySelector("form");
       if (!form) return;
       addTime();
 
       const pages = (migrateStore(loadStore()).pages) || {};
-      const totals = { copy:0, paste:0, cut:0, context:0, select:0, time_ms:0 };
+      const totals = { copy:0, paste:0, cut:0, context:0, select:0, drag:0, drop:0, time_ms:0 };
       for (const p of Object.values(pages)) {
         totals.copy    += p.counts.copy    || 0;
         totals.paste   += p.counts.paste   || 0;
         totals.cut     += p.counts.cut     || 0;
         totals.context += p.counts.context || 0;
         totals.select  += p.counts.select  || 0;
+        totals.drag    += p.counts.drag    || 0;
+        totals.drop    += p.counts.drop    || 0;
         totals.time_ms += p.time_ms        || 0;
       }
 
       const field = form.querySelector('[name="participant_metrics_json"]');
-      if (!field) return; 
+      if (!field) return;
       field.value = JSON.stringify({ totals, per_page: pages });
     }
-
     document.addEventListener("submit", injectHidden, true);
     window.addEventListener("beforeunload", injectHidden);
   })();

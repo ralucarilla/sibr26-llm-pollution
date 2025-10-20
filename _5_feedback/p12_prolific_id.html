@@ -12,6 +12,7 @@
 
   {% formfield player.prolific_id %}
   <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+  <input type="hidden" name="participant_metrics_json" id="id_participant_metrics_json" value="{{ player.participant_metrics_json }}">
 
   {{ next_button }}
 {% endblock %}
