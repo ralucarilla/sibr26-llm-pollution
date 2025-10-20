@@ -74,7 +74,7 @@ class p11_feedback(Page):
 
 class p12_prolific_id(Page):
     form_model = 'player'
-    form_fields = ['prolific_id', 'check', 'recaptcha_token', 'participant_metrics_json']
+    form_fields = ['prolific_id', 'check', 'recaptcha_token']
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
