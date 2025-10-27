@@ -2,8 +2,8 @@
 {% load otree static %}
 
 {% block content %}
-<p>We would like to know <b>if you used any help of artificial intelligence</b> when filling
-out this survey (e.g., ChatGPT, Gemini, Claude, Operator, Nanobrowser). Do not worry,
+<p>We would like to know <b>if you used any help of artificial intelligence when filling
+out this survey</b> (e.g., ChatGPT, Gemini, Claude, Operator, Nanobrowser). Do not worry,
 <b>this will also not affect your payment</b>. You will receive the promised compensation
 either way.</p>
 
@@ -13,7 +13,7 @@ either way.</p>
 
 <div id="ai-details-wrapper" class="mb-3" hidden aria-hidden="true">
   <label for="id_ai_use_details" class="form-label">
-    Could you provide a few details about <b>how you used AI</b> during this survey? (e.g., which tools, for what purpose)
+    Could you provide a few details about <b>how you used AI during THIS survey</b>? (e.g., which tools, for what purpose)
   </label>
   {{ formfield 'ai_use_details' label="" }}
 </div>
