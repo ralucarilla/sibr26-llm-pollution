@@ -1,6 +1,6 @@
 # SIBR 2026 LLM Pollution Workshop
 
-## Raluca Rilla & Dirk Wulff
+### by Raluca Rilla & Dirk Wulff
 
 This workshop is designed to help you get a hands-on sense of **LLM Pollution**, with a focus on understanding the capabilities of current agentic systems.
 
